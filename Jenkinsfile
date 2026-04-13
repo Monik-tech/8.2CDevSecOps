@@ -9,9 +9,10 @@ pipeline {
             }
         }
 
-        stage('2. Build (Install Dependencies)') {
+        stage('2. Install Dependencies') {
             steps {
                 bat '''
+                    echo Installing dependencies...
                     node -v
                     npm -v
                     npm install || exit 0
@@ -19,9 +20,12 @@ pipeline {
             }
         }
 
-        stage('3. Unit & Integration Testing') {
+        stage('3. Run Tests') {
             steps {
-                bat 'npm test || exit 0'
+                bat '''
+                    echo Running tests...
+                    npm test || exit 0
+                '''
             }
         }
 
@@ -33,7 +37,7 @@ pipeline {
 
                         sonar-scanner ^
                         -Dsonar.projectKey=Monik-tech_8.2CDevSecOps ^
-                        -Dsonar.organization=Monik-tech^
+                        -Dsonar.organization=Monik-tech ^
                         -Dsonar.host.url=https://sonarcloud.io ^
                         -Dsonar.login=%SONAR_TOKEN% ^
                         -Dsonar.sources=. ^
@@ -43,28 +47,31 @@ pipeline {
             }
         }
 
-        stage('5. Security Scan (npm audit)') {
+        stage('5. Security Scan (NPM Audit)') {
             steps {
-                bat 'npm audit || exit 0'
+                bat '''
+                    echo Running security scan...
+                    npm audit || exit 0
+                '''
             }
         }
 
         stage('6. Deploy to Staging (Simulated)') {
             steps {
-                echo 'Deploying to staging environment...'
+                echo 'Deploying application to staging environment...'
             }
         }
 
         stage('7. Deploy to Production (Simulated)') {
             steps {
-                echo 'Deploying to production environment...'
+                echo 'Deploying application to production environment...'
             }
         }
     }
 
     post {
         always {
-            echo 'Pipeline finished successfully!'
+            echo 'Pipeline execution completed successfully!'
         }
     }
 }
