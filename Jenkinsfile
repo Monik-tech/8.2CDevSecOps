@@ -33,11 +33,11 @@ pipeline {
             }
         }
 
-        // ✅ ADD THIS STAGE
+        // ✅ SONARCLOUD WITH TOKEN
         stage('SonarCloud Analysis') {
             steps {
-                withSonarQubeEnv('SonarCloud') {
-                    bat 'sonar-scanner'
+                withCredentials([string(credentialsId: 'Sonar_Token', variable: 'SONAR_TOKEN')]) {
+                    bat 'npx sonar-scanner -Dsonar.login=%SONAR_TOKEN%'
                 }
             }
         }
