@@ -32,5 +32,14 @@ pipeline {
                 bat 'npm audit || exit 0'
             }
         }
+
+        // ✅ ADD THIS STAGE
+        stage('SonarCloud Analysis') {
+            steps {
+                withSonarQubeEnv('SonarCloud') {
+                    bat 'sonar-scanner'
+                }
+            }
+        }
     }
 }
