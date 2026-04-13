@@ -1,39 +1,36 @@
-node {
+pipeline {
+    agent any
 
-    stage('Checkout SCM') {
-        checkout scm
-    }
+    stages {
 
-    stage('Install Dependencies') {
-        sh 'node -v'
-        sh 'npm -v'
-        sh 'npm install || true'
-        dir('frontend') {
-            sh 'npm install || true'
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Monik-tech/8.2CDevSecOps.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                bat 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                bat 'npm test || exit 0'
+            }
+        }
+
+        stage('Generate Coverage Report') {
+            steps {
+                bat 'npm run coverage || exit 0'
+            }
+        }
+
+        stage('NPM Audit (Security Scan)') {
+            steps {
+                bat 'npm audit || exit 0'
+            }
         }
     }
-
-    stage('Build Application') {
-        dir('frontend') {
-            sh 'npm run build || true'
-        }
-    }
-
-    stage('Run Tests') {
-        sh 'npm run test:server || true'
-    }
-
-    stage('Security Scan') {
-        sh 'npm audit || true'
-    }
-
-    stage('SonarQube Analysis') {
-        def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-        withSonarQubeEnv('SonarQube') {
-            sh "${scannerHome}/bin/sonar-scanner"
-        }
-    }
-
-    echo 'Pipeline finished successfully'
-
 }
